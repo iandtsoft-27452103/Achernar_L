@@ -90,7 +90,7 @@ This software use the records on the internet download by myself.
 
 (5) Compared to Policy Network, Value Network is not accurate.
 
-## Hou to use
+## How to use
 
 If you navigate to the execution environment folder and execute the start.bat, the specified game record will be analyzed. The command-line arguments are as follows:
 
