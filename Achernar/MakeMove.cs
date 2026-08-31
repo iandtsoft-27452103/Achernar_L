@@ -158,7 +158,8 @@ namespace Achernar
                         // 取った相手の石の連・碁盤・空白の情報を更新する
                         for (j = 0; j < k; j++)
                         {
-                            bt.seq_number_table[color, bt.seq_sq[color ^ 1, v3[i]][j]] = NSquare;
+                            //bt.seq_number_table[color, bt.seq_sq[color ^ 1, v3[i]][j]] = NSquare;
+                            bt.seq_number_table[color, bt.seq_sq[color ^ 1, v3[i]][j]] = seq_max;// 2026.8.29 変更
                             bt.pos_empty.Add(bt.seq_sq[color ^ 1, v3[i]][j]);
                             bt.board[bt.seq_sq[color ^ 1, v3[i]][j]] = 2;
                             bt.hash_key ^= Hash.StoneRand[color ^ 1, bt.seq_sq[color ^ 1, v3[i]][j]];
@@ -235,7 +236,8 @@ namespace Achernar
             if (bt.connect_flag[ply] == false)
             {
                 // 自分の石と連絡していない手
-                bt.seq_number_table[color, sq] = NSquare;
+                //bt.seq_number_table[color, sq] = NSquare;
+                bt.seq_number_table[color, sq] = seq_max;// 2026.8.29 変更
                 bt.seq_sq[color, bt.next_seq_num[color] - 1].Clear();
                 bt.dame_sq[color, bt.next_seq_num[color] - 1].Clear();
                 bt.next_seq_num[color]--;

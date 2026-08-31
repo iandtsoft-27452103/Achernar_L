@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Achernar.MakeMove;
 using static Achernar.Common;
+using static Achernar.Board;
 using System.Drawing;
 using System.Net.NetworkInformation;
 
@@ -396,20 +397,25 @@ namespace Achernar
             int result = 2;// 初期値は引き分け
             short ply = temp_ply;
             short color = start_color;
+            int pass_cnt = 0;
 
             try
             {
                 while (ply < ply_max)
                 {
-                    if (ply == ply_max - 1)
-                    {
-                        param8.MakeFeature(BTree, ref input_feature, color);
-                        //vector = param8.MatMul(input_feature);
+                    List<short> legal_move_list = new List<short>();
 
-                        double win_rate = param7.MatMul(input_feature);
-                        if (win_rate < 0.5)
+                    for (short i = 0; i < bt.pos_empty.Count; i++)
+                    {
+                        if (bt.IsMoveValid(bt, i, color))
+                            legal_move_list.Add(i);
+                    }
+
+                    if (ply == ply_max - 1 && legal_move_list.Count > 0)
+                    {
+                        if (CountTexture(ref bt) == 0)
                         {
-                            if (color != bt.RootColor)
+                            if (bt.RootColor == 0)
                             {
                                 result = 0;// root手番の勝ち
                             }
@@ -417,40 +423,55 @@ namespace Achernar
                             {
                                 result = 1;// 相手の勝ち
                             }
-                            break;
-                        }
-                    }
-
-                    List<short> legal_move_list = new List<short>();
-                    //List<int> score_list = new List<int>();
-
-                    /*for (int i = 0; i < legal_move_size; i++)
-                    {
-                        double d = vector.Max();
-                        short sq = (short)Array.IndexOf(vector, d);
-                        if (bt.IsMoveValid(bt, sq, color))
-                            legal_move_list.Add(sq);
-                    }*/
-                    for (short i = 0; i < bt.pos_empty.Count; i++)
-                    {
-                        if (bt.IsMoveValid(bt, i, color))
-                            legal_move_list.Add(i);
-                    }
-
-                    if (legal_move_list.Count == 0)
-                    {
-                        if (color != bt.RootColor)
-                        {
-                            result = 0;// root手番の勝ち
                         }
                         else
                         {
-                            result = 1;// 相手の勝ち
+                            if (bt.RootColor == 0)
+                            {
+                                result = 1;// 相手の勝ち
+                            }
+                            else
+                            {
+                                result = 0;// root手番の勝ち
+                            }
                         }
                         break;
                     }
 
-
+                    if (pass_cnt < 2)
+                    {
+                        if (legal_move_list.Count == 0)
+                        {
+                            pass_cnt++;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if (CountTexture(ref bt) == 0)
+                        {
+                            if (bt.RootColor == 0)
+                            {
+                                result = 0;// root手番の勝ち
+                            }
+                            else
+                            {
+                                result = 1;// 相手の勝ち
+                            }
+                        }
+                        else
+                        {
+                            if (bt.RootColor == 0)
+                            {
+                                result = 1;// 相手の勝ち
+                            }
+                            else
+                            {
+                                result = 0;// root手番の勝ち
+                            }
+                        }
+                        break;
+                    }
 
                     Random r = new Random();
                     int n = r.Next(legal_move_list.Count);
@@ -469,6 +490,51 @@ namespace Achernar
             }
 
             return result;
+        }
+
+        private int CountTexture(ref Board bt)
+        {
+            int black_count = 0;
+            int white_count = 0;
+            for (int i = 0; i < NSquare; i++)
+            {
+                int limit = PosCrossTable[i].Count();
+                int count = 0;
+                for (int j = 0; j < limit; j++)
+                {
+                    int sq = PosCrossTable[i][j];
+                    if (bt.seq_number_table[0, sq] != seq_max)
+                    {
+                        count++;
+                    }
+                }
+                if (count == limit)
+                {
+                    black_count++;
+                }
+            }
+            for (int i = 0; i < NSquare; i++)
+            {
+                int limit = PosCrossTable[i].Count();
+                int count = 0;
+                for (int j = 0; j < limit; j++)
+                {
+                    int sq = PosCrossTable[i][j];
+                    if (bt.seq_number_table[1, sq] != seq_max)
+                    {
+                        count++;
+                    }
+                }
+                if (count == limit)
+                {
+                    white_count++;
+                }
+            }
+            if (black_count > white_count + 7)
+            {
+                return 0;// black win
+            }
+            return 1;// white win
         }
 
         private void EvalNode(int node_index, short color)
@@ -659,6 +725,7 @@ namespace Achernar
                     else
                     {
                         Board bt = new Board();
+                        bt.DeepCopy(BTree, false);// 2026.8.29 追加
                         int result = PlayOut(ref bt, (short)(color ^ 1), idx, (short)(ply + 1));
                         EvalNode(idx, (short)(color ^ 1));
                         if (is_abort)

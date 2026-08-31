@@ -172,7 +172,7 @@ namespace Achernar
                 v = (float)((float)(correct_count_within3[0] + correct_count_within3[1]) / (float)records[0].str_moves.Count());
                 str_out += " " + v.ToString("P", CultureInfo.InvariantCulture);
                 str_out += "\n\n";
-                str_out += "解析解析エンジン名：Achernar Ver.1.0.2";// ToDo: ソフト名を考える。
+                str_out += "解析解析エンジン名：Achernar Ver.1.1.0";// 2026.8.29 バージョン番号変更。
                 sw.WriteLine(str_out);
             }
             //catch (Exception ex)
