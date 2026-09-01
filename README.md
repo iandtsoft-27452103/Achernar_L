@@ -66,11 +66,11 @@ This software use the records on the internet download by myself.
 
 (5) Memory usage on the PyTorch side: About 4.4 GB. It is slightly heavy.
 
-(6) Python's version: 3.12.10
+(6) Python's version: 3.13.15
 
 (7) It's necessary that the latest stable version of PyTorch is installed.
 
-(8) CUDA Version: 12.8.1
+(8) CUDA Version: 13.2.1
 
 (9) The cuDNN corresponding to (8) must be installed. (*)
 
